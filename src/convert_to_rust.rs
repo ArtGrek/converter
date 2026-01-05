@@ -304,7 +304,7 @@ impl Context {
         if self.rename.contains(orig) || orig.chars().next().map_or(false, |c| c.is_numeric()) {format!("{}_{}", to_snake_case(parent), to_snake_case(orig))} else {to_snake_case(orig)}
     }
     /// Генерирует итоговый код (enums + structs)
-    fn generate_code(&self, base_object: String, impl_from: bool, enums_path: String,) -> String {
+    fn generate_code(&self, generate_impl_from: bool, impl_base_object: String, external_enums_path: String, ) -> String {
         // создаём прогресс-бар
         let total_tasks = self.enums.iter().map(|e| e.variants.len()).sum::<usize>() + self.structs.iter().map(|s| s.fields.len()).sum::<usize>();
         let pb = ProgressBar::new(total_tasks as u64).with_style(ProgressStyle::default_bar().template("{spinner:.green} [{elapsed_precise}] {prefix} [{bar:40.cyan/blue}] {pos}/{len} {msg}").expect("invalid template"));
@@ -312,7 +312,7 @@ impl Context {
         let mut out = String::new();
         out.push_str("use serde::{Serialize, Deserialize};\n");
         // Enums
-        if !impl_from {
+        if !generate_impl_from {
             out.push_str("use strum_macros::Display;\n\n");
             for e in &self.enums {
                 out.push_str(&format!("#[derive(Debug, Serialize, Deserialize, Clone, Display{})]\n", (if e.is_string_enum {", Default"} else {""})));
@@ -371,7 +371,7 @@ impl Context {
                 out.push_str("}\n\n");*/
             }
         } else {
-            out.push_str(&format!("{}::{{", enums_path));
+            out.push_str(&format!("{}::{{", external_enums_path));
             for e in &self.enums {
                 out.push_str(&format!("{}, ", e.name));
             }
@@ -423,10 +423,10 @@ impl Context {
             }
             out.push_str("}\n\n");
 
-            if impl_from {
+            if generate_impl_from {
                 // добавляем impl From<model_name::Struct> для каждой структуры
-                out.push_str(&format!("impl From<{}::{}> for {} {{\n", base_object, s.name, s.name));
-                out.push_str(&format!("\tfn from(obj: {}::{}) -> Self {{\n", base_object, s.name));
+                out.push_str(&format!("impl From<{}::{}> for {} {{\n", impl_base_object, s.name, s.name));
+                out.push_str(&format!("\tfn from(obj: {}::{}) -> Self {{\n", impl_base_object, s.name));
                 out.push_str(&format!("\t\t{} {{\n", s.name));
                 for f in &s.fields {
                     // определяем присвоение в зависимости от типа
@@ -480,10 +480,10 @@ impl Context {
 }
 
 /// Вспомогательная функция: генерирует полный код из параметров
-pub fn generate_structs(root_name: &str, transactions: &[Value], skip_comments: &[&str], rename: &[&str], base_object: String, impl_from: bool, enums_path: String,) -> String {
+pub fn generate_structs(root_name: &str, transactions: &[Value], skip_comments: &[&str], rename: &[&str], generate_impl_from: bool, impl_base_object: String, external_enums_path: String, ) -> String {
     let mut ctx = Context::new(skip_comments, rename);
     ctx.build_root(&to_upper_camel_case(&capitalize(root_name)), transactions);
-    ctx.generate_code(base_object, impl_from, enums_path)
+    ctx.generate_code(generate_impl_from, impl_base_object, external_enums_path)
 }
 
 fn unique_values_summary(vals: &[&Value]) -> String {
