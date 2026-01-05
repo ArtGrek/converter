@@ -7,4 +7,3 @@ pub async fn execute(provider_name: &str, game_name: &str, mode: &str, action: &
         _ => {Err(format!("\r\tGame not implement").into())}
     }
 }
-//src\games\pragmaticplay\mod.rs

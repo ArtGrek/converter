@@ -1,5 +1,5 @@
 {
-	"modes":["100","150","10000","45000"],
+	"modes":["100","7000","30000"],
 	"actions":["doInit","doSpin","doCollect"],
 	"skip_comments":["stime"],
 	"rename":["in", "out", "type"]

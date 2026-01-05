@@ -1,4 +1,4 @@
-//src\games\pragmaticplay\big_bass_bonanza_1000\mod.rs
+//src\games\enjoygaming\grand_lightning\mod.rs
 use serde_json::Value;
 use std::fs;
 use crate::storage::load_transactions;

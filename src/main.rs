@@ -158,6 +158,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
                 eprintln!("Error executing {provider_name} game {game_name}: {e}");
             }
         },
+        "enjoygaming" => {
+            if let Err(e) = games::enjoygaming::execute(&provider_name, &game_name, &mode, &action).await {
+                eprintln!("Error executing {provider_name} game {game_name}: {e}");
+            }
+        },
         _ => {println!("Provider not implement");}
     } 
     Ok(())
