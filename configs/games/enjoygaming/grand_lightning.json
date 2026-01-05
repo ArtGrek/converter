@@ -1,6 +1,6 @@
 {
 	"modes":["100","7000","30000"],
-	"actions":["doInit","doSpin","doCollect"],
+	"actions":["init","spin","bonus_init","respin","bonus_spins_stop"],
 	"skip_comments":[
 		"prev_client_command_time", "request_id", "huid", "session_id", "nick", 
 		"balance", "balance_version", "last_win", "total_win", "round_win", "win"

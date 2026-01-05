@@ -85,71 +85,78 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         }
     };
 
-    let game_config: Value = serde_json::from_str(&(fs::read_to_string(format!("./configs/games/{provider_name}/{game_name}.json")).unwrap_or_default())).unwrap_or_default();
-    
-    let mut supported_modes: Vec<String> = game_config.get("modes").and_then(|b| b.as_array()).map(|a| a.iter().filter_map(|v| v.as_str().map(|s| s.to_string())).collect()).unwrap_or_default();
-    supported_modes.sort_by_key(|s| s.parse::<u64>().unwrap_or(u64::MAX));
-    let mut rg = DefaultEditor::new()?;
-    tokio::fs::create_dir_all(&format!("{location}/temporary/games/{provider_name}/{game_name}")).await?;
-    let modes_history_path = &format!("{location}/temporary/games/{provider_name}/{game_name}/mode_history.txt");
-    let _ = rg.load_history(modes_history_path);
-    println!("Supported modes for game '{}':", game_name);
-    for m in &supported_modes {println!("\t- {}", m);}
-    if rg.history().is_empty() {
-        for m in &supported_modes {
-            let _ = rg.add_history_entry(m);
-            let _ = rg.save_history(modes_history_path);
-        }
-    }
-    let mode = loop {
-        match rg.readline("Input mode (required): ") {
-            Ok(line) => {
-                let trimmed = line.trim().to_string();
-                if !trimmed.is_empty() && supported_modes.contains(&trimmed) {
-                    let items: Vec<String> = rg.history().iter().filter(|h| h.as_str() != trimmed).cloned().collect();
-                    let _ = rg.clear_history();
-                    for h in &items {let _ = rg.add_history_entry(h.as_str());}
-                    let _ = rg.save_history(modes_history_path);
-                    let _ = rg.add_history_entry(trimmed.as_str());
-                    if rg.append_history(modes_history_path).is_err() {let _ = rg.save_history(modes_history_path);}
-                    break trimmed;
-                }
-            }
-            Err(ReadlineError::Interrupted) | Err(ReadlineError::Eof) => { return Ok(()); }
-            Err(err) => { eprintln!("Error: {:?}", err); return Ok(()); }
-        }
-    };
 
-    
-    let mut supported_actions: Vec<String> = game_config.get("actions").and_then(|b| b.as_array()).map(|a| a.iter().filter_map(|v| v.as_str().map(|s| s.to_string())).collect()).unwrap_or_default();
-    supported_actions.sort();
-    let mut rg = DefaultEditor::new()?;
-    let actions_history_path = &format!("./temporary/games/{provider_name}/{game_name}/action_history.txt");
-    let _ = rg.load_history(actions_history_path);
-    println!("Supported actions for game '{}':", game_name);
-    for m in &supported_actions {println!("\t- {}", m);}
-    if rg.history().is_empty() {
-        for m in &supported_actions {
-            let _ = rg.add_history_entry(m);
-            let _ = rg.save_history(actions_history_path);
-        }
-    }
-    let action = loop {
-        match rg.readline("Input action (required): ") {
-            Ok(line) => {
-                let trimmed = line.trim().to_string();
-                if !trimmed.is_empty() && supported_actions.contains(&trimmed) {
-                    let items: Vec<String> = rg.history().iter().filter(|h| h.as_str() != trimmed).cloned().collect();
-                    let _ = rg.clear_history();
-                    for h in &items {let _ = rg.add_history_entry(h.as_str());}
-                    let _ = rg.save_history(actions_history_path);
-                    let _ = rg.add_history_entry(trimmed.as_str());
-                    if rg.append_history(actions_history_path).is_err() {let _ = rg.save_history(actions_history_path);}
-                    break trimmed;
+    let choice = rg.readline("Select [1=to all modes and actions, 2=choice]: ")?;
+    let (mode, action) = match choice.trim() {
+        "1" => { ("all".to_string(), "all".to_string()) },
+        _ => {
+            let game_config: Value = serde_json::from_str(&(fs::read_to_string(format!("./configs/games/{provider_name}/{game_name}.json")).unwrap_or_default())).unwrap_or_default();
+            
+            let mut supported_modes: Vec<String> = game_config.get("modes").and_then(|b| b.as_array()).map(|a| a.iter().filter_map(|v| v.as_str().map(|s| s.to_string())).collect()).unwrap_or_default();
+            supported_modes.sort_by_key(|s| s.parse::<u64>().unwrap_or(u64::MAX));
+            let mut rg = DefaultEditor::new()?;
+            tokio::fs::create_dir_all(&format!("{location}/temporary/games/{provider_name}/{game_name}")).await?;
+            let modes_history_path = &format!("{location}/temporary/games/{provider_name}/{game_name}/mode_history.txt");
+            let _ = rg.load_history(modes_history_path);
+            println!("Supported modes for game '{}':", game_name);
+            for m in &supported_modes {println!("\t- {}", m);}
+            if rg.history().is_empty() {
+                for m in &supported_modes {
+                    let _ = rg.add_history_entry(m);
+                    let _ = rg.save_history(modes_history_path);
                 }
             }
-            Err(ReadlineError::Interrupted) | Err(ReadlineError::Eof) => { return Ok(()); }
-            Err(err) => { eprintln!("Error: {:?}", err); return Ok(()); }
+            let mode = loop {
+                match rg.readline("Input mode (required): ") {
+                    Ok(line) => {
+                        let trimmed = line.trim().to_string();
+                        if !trimmed.is_empty() && supported_modes.contains(&trimmed) {
+                            let items: Vec<String> = rg.history().iter().filter(|h| h.as_str() != trimmed).cloned().collect();
+                            let _ = rg.clear_history();
+                            for h in &items {let _ = rg.add_history_entry(h.as_str());}
+                            let _ = rg.save_history(modes_history_path);
+                            let _ = rg.add_history_entry(trimmed.as_str());
+                            if rg.append_history(modes_history_path).is_err() {let _ = rg.save_history(modes_history_path);}
+                            break trimmed;
+                        }
+                    }
+                    Err(ReadlineError::Interrupted) | Err(ReadlineError::Eof) => { return Ok(()); }
+                    Err(err) => { eprintln!("Error: {:?}", err); return Ok(()); }
+                }
+            };
+            
+            let mut supported_actions: Vec<String> = game_config.get("actions").and_then(|b| b.as_array()).map(|a| a.iter().filter_map(|v| v.as_str().map(|s| s.to_string())).collect()).unwrap_or_default();
+            supported_actions.sort();
+            let mut rg = DefaultEditor::new()?;
+            let actions_history_path = &format!("{location}/temporary/games/{provider_name}/{game_name}/action_history.txt");
+            let _ = rg.load_history(actions_history_path);
+            println!("Supported actions for game '{}':", game_name);
+            for m in &supported_actions {println!("\t- {}", m);}
+            if rg.history().is_empty() {
+                for m in &supported_actions {
+                    let _ = rg.add_history_entry(m);
+                    let _ = rg.save_history(actions_history_path);
+                }
+            }
+            let action = loop {
+                match rg.readline("Input action (required): ") {
+                    Ok(line) => {
+                        let trimmed = line.trim().to_string();
+                        if !trimmed.is_empty() && supported_actions.contains(&trimmed) {
+                            let items: Vec<String> = rg.history().iter().filter(|h| h.as_str() != trimmed).cloned().collect();
+                            let _ = rg.clear_history();
+                            for h in &items {let _ = rg.add_history_entry(h.as_str());}
+                            let _ = rg.save_history(actions_history_path);
+                            let _ = rg.add_history_entry(trimmed.as_str());
+                            if rg.append_history(actions_history_path).is_err() {let _ = rg.save_history(actions_history_path);}
+                            break trimmed;
+                        }
+                    }
+                    Err(ReadlineError::Interrupted) | Err(ReadlineError::Eof) => { return Ok(()); }
+                    Err(err) => { eprintln!("Error: {:?}", err); return Ok(()); }
+                }
+            };
+            (mode, action)
         }
     };
 
