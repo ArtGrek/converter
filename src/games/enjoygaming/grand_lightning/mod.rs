@@ -12,7 +12,6 @@ pub async fn execute(provider_name: &str, game_name: &str, mode: &str, action: &
     let binding = vec![];
     let skip_comments: Vec<&str> = game_config.get("skip_comments").and_then(|v| v.as_array()).unwrap_or(&binding).iter().filter_map(|v| v.as_str().map(|s| s)).collect();
     let rename: Vec<&str> = game_config.get("rename").and_then(|v| v.as_array()).unwrap_or(&binding).iter().filter_map(|v| v.as_str().map(|s| s)).collect();
-    
     let transactions_path = format!("{location}/{provider_name}/{game_name}/transactions");
     let transactions: Vec<Value> = load_transactions(transactions_path);
     {
