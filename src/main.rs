@@ -8,6 +8,7 @@ use rustyline::DefaultEditor;
 use rustyline::history::History;
 pub mod games;
 pub mod storage;
+pub mod convert_to_rust;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
