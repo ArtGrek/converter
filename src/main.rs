@@ -154,16 +154,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     };
 
     match provider_name.as_str() {
-        "pragmaticplay" => {
-            if let Err(e) = games::pragmaticplay::execute(&provider_name, &game_name, &mode, &action).await {
-                eprintln!("Error executing {provider_name} game {game_name}: {e}");
-            }
-        },
-        "enjoygaming" => {
-            if let Err(e) = games::enjoygaming::execute(&provider_name, &game_name, &mode, &action).await {
-                eprintln!("Error executing {provider_name} game {game_name}: {e}");
-            }
-        },
+        "pragmaticplay" => {if let Err(e) = games::pragmaticplay::execute(&provider_name, &game_name, &mode, &action).await {eprintln!("Error executing {provider_name} game {game_name}: {e}");}},
+        "enjoygaming" => {if let Err(e) = games::enjoygaming::execute(&provider_name, &game_name, &mode, &action).await {eprintln!("Error executing {provider_name} game {game_name}: {e}");}},
         _ => {println!("Provider not implement");}
     } 
     Ok(())

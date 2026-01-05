@@ -2,6 +2,7 @@ use serde_json::Value;
 use std::path::Path;
 use std::fs;
 //use std::io;
+use walkdir::WalkDir;
 use indicatif::{ProgressBar, ProgressStyle, };
 
 pub fn load_transactions (a_location: String, ) -> Vec<Value>{
@@ -11,19 +12,16 @@ pub fn load_transactions (a_location: String, ) -> Vec<Value>{
     pb_main.set_style(ProgressStyle::default_bar().template("{prefix} [{bar:100.cyan/blue}] {pos}/{len} {msg}").expect("ProgressBar template error"),);
     let mut l_transactions: Vec<Value> = Vec::new();
     if Path::new(&transactions_file_path).is_dir() {
-        let total = std::fs::read_dir(&transactions_file_path).unwrap().filter(|r| r.as_ref().map(|e| {e.path().extension().and_then(|s| s.to_str()) == Some("json")}).unwrap_or(false)).count() as u64;
+        let total = WalkDir::new(&transactions_file_path).into_iter().filter_map(Result::ok).filter(|e| {e.path().is_file() && e.path().extension().and_then(|s| s.to_str()) == Some("json")}).count() as u64;
         pb_main.set_length(total);
-        for entry in std::fs::read_dir(&transactions_file_path).unwrap() {
-            let entry = entry.unwrap();
-            let path = entry.path();
+        for entry in WalkDir::new(&transactions_file_path).into_iter().filter_map(Result::ok) {
+            let path = entry.path().to_path_buf();
             if path.extension().and_then(|s| s.to_str()) == Some("json") {
-               
                 let mut content = std::fs::read_to_string(&path).unwrap();
                 if let Some(pos) = content.rfind('}') {content.truncate(pos + 1);}
                 let data: Vec<Value> = serde_json::from_str(&("[".to_owned() + &content.clone() + "]")).unwrap();
                 let filtered_data: Vec<Value> = data.iter().map(|item| item.clone()).collect();
                 l_transactions.extend(filtered_data);
-                
             }
             pb_main.inc(1);
         }

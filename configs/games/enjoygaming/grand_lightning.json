@@ -1,6 +1,6 @@
 {
 	"modes":["100","7000","30000"],
 	"actions":["doInit","doSpin","doCollect"],
-	"skip_comments":["prev_client_command_time", "request_id", "balance", "balance_version"],
+	"skip_comments":["prev_client_command_time", "request_id", "balance", "balance_version", "huid", "session_id"],
 	"rename":["in", "out", "type"]
 }

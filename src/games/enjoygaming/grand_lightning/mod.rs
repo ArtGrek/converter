@@ -13,10 +13,27 @@ pub async fn execute(provider_name: &str, game_name: &str, mode: &str, action: &
     let skip_comments: Vec<&str> = game_config.get("skip_comments").and_then(|v| v.as_array()).unwrap_or(&binding).iter().filter_map(|v| v.as_str().map(|s| s)).collect();
     let rename: Vec<&str> = game_config.get("rename").and_then(|v| v.as_array()).unwrap_or(&binding).iter().filter_map(|v| v.as_str().map(|s| s)).collect();
     
+    let transactions_path = format!("{location}/{provider_name}/{game_name}/transactions");
+    let transactions: Vec<Value> = load_transactions(transactions_path);
+    {
+        let ins: Vec<Value> = transactions.iter().filter_map(|tx| tx.get("in").cloned()).collect();
+        let root_name = "grand_lightning_in";
+        let rust_struct = generate_structs(root_name, &ins, &skip_comments, &rename, false, "".to_string(), "".to_string());
+        let structure_path = format!("{location}/{provider_name}/{game_name}/models/{root_name}.rs");
+        save_content(structure_path, rust_struct);
+    }
+    {
+        let outs: Vec<Value> = transactions.iter().filter_map(|tx| tx.get("out").cloned()).collect();
+        let root_name = "grand_lightning_out";
+        let rust_struct = generate_structs(root_name, &outs, &skip_comments, &rename, false, "".to_string(), "".to_string());
+        let structure_path = format!("{location}/{provider_name}/{game_name}/models/{root_name}.rs");
+        save_content(structure_path, rust_struct);
+    }
+
     let transactions_path = format!("{location}/{provider_name}/{game_name}/transactions/bet_{mode}");
     let transactions: Vec<Value> = load_transactions(transactions_path);
     let root_name = "grand_lightning";
-    let rust_struct = generate_structs(root_name, &transactions, &skip_comments, &rename, false, "base_object".to_string(), "enums_path".to_string());
+    let rust_struct = generate_structs(root_name, &transactions, &skip_comments, &rename, false, "".to_string(), "".to_string());
     let structure_path = format!("{location}/{provider_name}/{game_name}/models/bet_{mode}/{root_name}.rs");
     save_content(structure_path, rust_struct);
     
