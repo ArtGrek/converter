@@ -352,7 +352,7 @@ impl Context {
                 //impl
                 // добавляем impl From<model_name::Enum> для каждого enum
                 /*out.push_str(&format!("impl From<{}::{}> for {} {{\n", base_object, e.name, e.name));
-                out.push_str(&format!("\tfn from(obj: {}::{}) -> Self {{\n", base_object, e.name));
+                out.push_str(&format!("\tfn from(obj::{}::{}) -> Self {{\n", base_object, e.name));
                 out.push_str("\t\tmatch obj {\n");
                 if e.is_string_enum {
                     for variant in &e.variants {
@@ -426,7 +426,7 @@ impl Context {
             if generate_impl_from {
                 // добавляем impl From<model_name::Struct> для каждой структуры
                 out.push_str(&format!("impl From<{}::{}> for {} {{\n", impl_source_object, s.name, s.name));
-                out.push_str(&format!("\tfn from(obj: {}::{}) -> Self {{\n", impl_source_object, s.name));
+                out.push_str(&format!("\tfn from(obj::{}::{}) -> Self {{\n", impl_source_object, s.name));
                 out.push_str(&format!("\t\t{} {{\n", s.name));
                 for f in &s.fields {
                     // определяем присвоение в зависимости от типа
