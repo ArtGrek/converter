@@ -54,7 +54,7 @@ pub async fn execute(provider_name: &str, game_name: &str, mode: Option<&str>, c
         })
         .filter_map(|tx| tx.get("out").cloned()).collect();
         let root_name = format!("{action_name}out");
-        let rust_struct = generate_structs(&root_name, &outs, &skip_comments, &rename, command.is_some(), format!("{game_name}_in"), format!("use crate::{game_name}_out::"));
+        let rust_struct = generate_structs(&root_name, &outs, &skip_comments, &rename, command.is_some(), format!("{game_name}_out"), format!("use crate::{game_name}_out::"));
         let structure_path = format!("{location}/{provider_name}/{game_name}/models{mode_path}{command_path}/{root_name}.rs");
         save_content(structure_path, rust_struct);
     }
