@@ -191,7 +191,7 @@ impl Context {
             let vals_set: BTreeSet<String> = non_null.iter().filter_map(|v| v.as_str().map(String::from)).collect();
             // Если уникальных значений от 2 до 9 включительно — делаем enum,
             // иначе — оставляем String
-            if (2..=9).contains(&vals_set.len()) && !self.skip_comments.contains(field) {
+            if (2..=19).contains(&vals_set.len()) && !self.skip_comments.contains(field) {
                 // общая подпись
                 let sig = format!("StringEnum:{}", vals_set.iter().cloned().collect::<Vec<_>>().join("|"));
                 // реюз или создание нового enum-а
@@ -203,7 +203,7 @@ impl Context {
                 };
                 return FieldType::Enum(enum_name);
             } else {
-                // слишком мало (0–1) или слишком много (>=10) вариантов — просто String
+                // слишком мало (0–1) или слишком много (>=19) вариантов — просто String
                 return FieldType::Scalar(ScalarType::String);
             }
         }
