@@ -1,13 +1,14 @@
 {
 	"modes":["100","150","10000","45000"],
-	"commands":["play"],
+	"commands":[],
 	"actions":["doInit","doSpin","doCollect"],
 	"skip_comments":[
 		"stime", "counter", "index", "mgckey",
 		"balance", "balance_bonus", "balance_cash",
 		"fsres", "fsres_total", "fswin", "fswin_total",
-		"is", "mo", "mo_tw", "ntp", "s", "sa", "sb",
-		"tw", "w", "s", "sa", "sb"
+		"is", "mo", "mo_tw", "mo_tv", "ntp", "s", "sa", "sb",
+		"tw", "w", 
+		"tmb_down"
 	],
 	"rename":["in", "out", "type"]
 }
