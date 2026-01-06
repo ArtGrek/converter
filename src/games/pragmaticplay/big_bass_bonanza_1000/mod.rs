@@ -21,14 +21,13 @@ pub async fn execute(provider_name: &str, game_name: &str, mode: Option<&str>, c
     {
         let ins: Vec<Value> = transactions.iter()
         .filter(|tx| {
-            (tx.get("out")
+            (tx.get("in")
                 .and_then(|o| o.get("command"))
                 .and_then(|c| c.as_str())
                 == command || command.is_none())
             &&
-            (tx.get("out")
-                .and_then(|o| o.get("context"))
-                .and_then(|c| c.get("last_action"))
+            (tx.get("in")
+                .and_then(|c| c.get("action"))
                 .and_then(|a| a.as_str())
                 == action || action.is_none())
         })
@@ -41,14 +40,13 @@ pub async fn execute(provider_name: &str, game_name: &str, mode: Option<&str>, c
     {
         let outs: Vec<Value> = transactions.iter()
         .filter(|tx| {
-            (tx.get("out")
+            (tx.get("in")
                 .and_then(|o| o.get("command"))
                 .and_then(|c| c.as_str())
                 == command || command.is_none())
             &&
-            (tx.get("out")
-                .and_then(|o| o.get("context"))
-                .and_then(|c| c.get("last_action"))
+            (tx.get("in")
+                .and_then(|c| c.get("action"))
                 .and_then(|a| a.as_str())
                 == action || action.is_none())
         })
