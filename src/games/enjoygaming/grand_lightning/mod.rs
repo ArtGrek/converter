@@ -20,16 +20,15 @@ pub async fn execute(provider_name: &str, game_name: &str, mode: Option<&str>, c
     let transactions: Vec<Value> = load_transactions(transactions_path);
     {
         let ins: Vec<Value> = transactions.iter().filter(|tx| {
-            (tx.get("out")
-                .and_then(|o| o.get("command"))
-                .and_then(|c| c.as_str())
-                == command || command.is_none())
+            (
+                tx.get("out").and_then(|o| o.get("command")).and_then(|c| c.as_str()) == command 
+                || command.is_none()
+            )
             &&
-            (tx.get("out")
-                .and_then(|o| o.get("context"))
-                .and_then(|c| c.get("last_action"))
-                .and_then(|a| a.as_str())
-                == action || action.is_none())
+            (
+                tx.get("out").and_then(|o| o.get("context")).and_then(|c| c.get("last_action")).and_then(|a| a.as_str()) == action 
+                || action.is_none()
+            )
         }).filter_map(|tx| tx.get("in").cloned()).collect();
         let root_name = format!("{action_name}in");
         let rust_struct = generate_structs(&root_name, &ins, &skip_comments, &rename, false, format!("{game_name}_in"), format!("use crate::{game_name}_in::"));
@@ -38,16 +37,15 @@ pub async fn execute(provider_name: &str, game_name: &str, mode: Option<&str>, c
     }
     {
         let outs: Vec<Value> = transactions.iter().filter(|tx| {
-            (tx.get("out")
-                .and_then(|o| o.get("command"))
-                .and_then(|c| c.as_str())
-                == command || command.is_none())
+            (
+                tx.get("out").and_then(|o| o.get("command")).and_then(|c| c.as_str()) == command 
+                || command.is_none()
+            )
             &&
-            (tx.get("out")
-                .and_then(|o| o.get("context"))
-                .and_then(|c| c.get("last_action"))
-                .and_then(|a| a.as_str())
-                == action || action.is_none())
+            (
+                tx.get("out").and_then(|o| o.get("context")).and_then(|c| c.get("last_action")).and_then(|a| a.as_str()) == action 
+                || action.is_none()
+            )
         }).filter_map(|tx| tx.get("out").cloned()).collect();
         let root_name = format!("{action_name}out");
         let rust_struct = generate_structs(&root_name, &outs, &skip_comments, &rename, false, format!("{game_name}_out"), format!("use crate::{game_name}_out::"));
